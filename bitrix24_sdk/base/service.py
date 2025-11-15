@@ -13,6 +13,16 @@ class BaseService:
         self._http = http
 
     def methods(self, full: bool = None, scope: Optional[str] = None) -> Methods:
+        """
+        Получить список доступных методов API.
+
+        Args:
+            full: Возвращать полную информацию о методах
+            scope: Фильтр по scope
+
+        Returns:
+            Methods: Список доступных методов
+        """
         params = MethodsParams(full=full, scope=scope)
         return self._http.call_pydantic(
             method="methods",
@@ -21,6 +31,15 @@ class BaseService:
         )
 
     def scope(self, full: bool = None) -> Scope:
+        """
+        Получить информацию о scope авторизации.
+
+        Args:
+            full: Возвращать полную информацию
+
+        Returns:
+            Scope: Информация о scope
+        """
         params = ScopeParams(full=full)
         return self._http.call_pydantic(
             method="scope",

@@ -11,11 +11,13 @@ class BitrixHttpClient:
     def __init__(self, token: str, user_id: int | str, settings: BitrixSettings | None = None,
                  session: Optional[requests.Session] = None,) -> None:
         """
+        Инициализация HTTP-клиента.
 
-        :param token:
-        :param user_id:
-        :param settings:
-        :param session:
+        Args:
+            token: Токен авторизации Bitrix24
+            user_id: ID пользователя
+            settings: Настройки подключения
+            session: HTTP-сессия (опционально)
         """
         self.settings = settings or load_bitrix_settings()
         self._token = token
@@ -28,6 +30,20 @@ class BitrixHttpClient:
         self._session = session or requests.Session()
 
     def call(self, method: str, params: Optional[Dict[str, Any]] = None, files: Optional[Dict[str, Any]] = None) -> Any:
+        """
+        Выполнить вызов метода Bitrix24 API.
+
+        Args:
+            method: Название метода API
+            params: Параметры запроса
+            files: Файлы для загрузки
+
+        Returns:
+            Ответ от API в виде словаря
+
+        Raises:
+            RuntimeError: При ошибке в ответе Bitrix24
+        """
         url = f"{self._base_url}{method}.json"
 
         resp = self._session.post(
@@ -48,6 +64,15 @@ class BitrixHttpClient:
                       files: Optional[Dict[str, Any]] = None) -> BaseModel:
         """
         Вызвать метод и сразу получить Pydantic-модель на основе result.
+
+        Args:
+            method: Название метода API
+            params: Параметры запроса
+            model: Pydantic модель для валидации
+            files: Файлы для загрузки
+
+        Returns:
+            Валидированная Pydantic модель
         """
         raw_result = self.call(method=method, params=params, files=files)
         return model.model_validate(raw_result)

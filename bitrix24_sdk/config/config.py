@@ -8,11 +8,33 @@ DEFAULT_CONFIG_PATH = os.path.join(CONFIG_DIR, "bitrix_settings.json")
 
 
 class BitrixSettings(BaseModel, extra="forbid"):
+    """
+    Настройки подключения к Bitrix24.
+
+    Attributes:
+        BASE_URL: Базовый URL для API Bitrix24
+        TIMEOUT: Таймаут для HTTP запросов в секундах
+    """
     BASE_URL: str = Field(..., title="Базовый url Bitrix24")
     TIMEOUT: float = Field(60, title="Время на отправку запроса")
 
 
 def load_bitrix_settings(path: str | None = None, override: BitrixSettings | None = None) -> BitrixSettings:
+    """
+    Загрузить настройки Bitrix24 из файла или использовать переданные.
+
+    Args:
+        path: Путь к JSON файлу с настройками
+        override: Готовый объект настроек (игнорирует файл)
+
+    Returns:
+        BitrixSettings: Загруженные настройки
+
+    Raises:
+        FileNotFoundError: Если файл конфигурации не найден
+        ValueError: При ошибке парсинга JSON
+        RuntimeError: При других ошибках загрузки
+    """
     if override is not None:
         return override
 

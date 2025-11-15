@@ -70,6 +70,16 @@ class DiskService:
         )
 
     def get_list(self, filter: Optional[Dict[str, Any]] = None, start: Optional[int] = None) -> GetList:
+        """
+        Получить список доступных хранилищ.
+
+        Args:
+            filter: Фильтр по полям
+            start: Начальная позиция для пагинации
+
+        Returns:
+            GetList: Список хранилищ
+        """
         params = GetListParams(filter=filter, start=start)
         return self._http.call_pydantic(
             method="disk.storage.getlist",
@@ -78,6 +88,15 @@ class DiskService:
         )
 
     def get_storage(self, id: str) -> GetStorage:
+        """
+        Получить информацию о хранилище по ID.
+
+        Args:
+            id: ID хранилища
+
+        Returns:
+            GetStorage: Информация о хранилище
+        """
         params = GetStorageParams(id=id)
         return self._http.call_pydantic(
             method="disk.storage.get",
@@ -86,6 +105,15 @@ class DiskService:
         )
 
     def get_folder(self, id: int) -> GetFolder:
+        """
+        Получить информацию о папке по ID.
+
+        Args:
+            id: ID папки
+
+        Returns:
+            GetFolder: Информация о папке
+        """
         params = GetFolderParams(id=id)
         return self._http.call_pydantic(
             method="disk.folder.get",
@@ -94,6 +122,16 @@ class DiskService:
         )
 
     def add_folder(self, id: str, data: Dict[str, Any]) -> AddFolder:
+        """
+        Создать папку в корне хранилища.
+
+        Args:
+            id: ID хранилища
+            data: Данные папки, обязательно поле "NAME"
+
+        Returns:
+            AddFolder: Информация о созданной папке
+        """
         params = AddFolderParams(id=id, data=data)
         return self._http.call_pydantic(
             method="disk.storage.addfolder",
@@ -124,6 +162,15 @@ class DiskService:
         )
 
     def get_file(self, id: int) -> GetFile:
+        """
+        Получить информацию о файле по ID.
+
+        Args:
+            id: ID файла
+
+        Returns:
+            GetFile: Информация о файле
+        """
         params = GetFileParams(id=id)
         return self._http.call_pydantic(
             method="disk.file.get",
@@ -132,6 +179,15 @@ class DiskService:
         )
 
     def delete_tree(self, id: int) -> DeleteTree:
+        """
+        Уничтожить папку и все дочерние элементы навсегда.
+
+        Args:
+            id: ID папки
+
+        Returns:
+            DeleteTree: Результат удаления
+        """
         params = DeleteTreeParams(id=id)
         return self._http.call_pydantic(
             method="disk.folder.deletetree",
@@ -141,18 +197,19 @@ class DiskService:
 
     def upload_file(self, id: int, data: Dict[str, Any], file_content: Optional[str] = None,
                    generate_unique_name: Optional[bool] = None, rights: Optional[List[Dict[str, Any]]] = None) -> UploadFile:
-        params = UploadFileParams(
-            id=id, data=data, file_content=file_content,
-            generate_unique_name=generate_unique_name, rights=rights
-        )
-        return self._http.call_pydantic(
-            method="disk.folder.uploadfile",
-            params=params.to_bx_params(),
-            model=UploadFile,
-        )
+        """
+        Загрузить файл в папку (с base64 или получить uploadUrl).
 
-    def upload_file(self, id: int, data: Dict[str, Any], file_content: str, generate_unique_name: Optional[bool] = None, rights: Optional[List[Dict[str, Any]]] = None):
-        """Загрузить файл в папку (с base64 или получить uploadUrl)"""
+        Args:
+            id: ID папки
+            data: Данные файла, обязательно поле "NAME"
+            file_content: Содержимое файла в Base64
+            generate_unique_name: Генерировать уникальное имя при конфликте
+            rights: Права доступа
+
+        Returns:
+            UploadFile или GetUploadUrl: Результат загрузки или URL для загрузки
+        """
         params = UploadFileParams(
             id=id, data=data, file_content=file_content,
             generate_unique_name=generate_unique_name, rights=rights
@@ -208,7 +265,15 @@ class DiskService:
             raise Exception(f"Ошибка загрузки: {response.status_code}, {response.text}")
 
     def get_upload_url(self, id: int) -> GetUploadUrl:
-        """Получить URL для загрузки файла (двухэтапная загрузка)"""
+        """
+        Получить URL для загрузки файла (двухэтапная загрузка).
+
+        Args:
+            id: ID папки
+
+        Returns:
+            GetUploadUrl: URL и поле для загрузки файла
+        """
         return self._http.call_pydantic(
             method="disk.folder.uploadfile",
             params={"id": id},

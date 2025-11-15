@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 
 class FolderInfo(BaseModel):
+    """Информация о папке."""
     id: int = Field(..., description="Идентификатор", alias="ID")
     name: str = Field(..., description="Название папки", alias="NAME")
     code: Optional[str] = Field(None, description="символьный код", alias="CODE")
@@ -17,6 +18,7 @@ class FolderInfo(BaseModel):
 
 
 class FileInfo(BaseModel):
+    """Информация о файле."""
     id: int = Field(..., description="Идентификатор файла", alias="ID")
     name: str = Field(..., description="Название файла", alias="NAME")
     code: Optional[str] = Field(None, description="Символьный код", alias="CODE")
@@ -40,19 +42,21 @@ class GetChildrenParams(BaseModel):
 
     def to_bx_params(self) -> dict:
         params = self.model_dump(exclude_none=True)
-        # Извлекаем поля из filter и делаем их отдельными параметрами
+    
         if 'filter' in params and isinstance(params['filter'], dict):
-            filter_dict = params.pop('filter')  # Удаляем filter из params
+            filter_dict = params.pop('filter')
             for key, value in filter_dict.items():
-                params[f'filter[{key}]'] = value  # Добавляем как filter[key]
+                params[f'filter[{key}]'] = value
         return params
 
 class GetChildren(BaseModel):
+    """Ответ метода disk.folder.getchildren."""
     result: Optional[List[FolderInfo]] = Field(None, description="Список папок и файлов")
     next: Optional[int] = Field(None, description="Номер следующего элемента для постраничной навигации")
 
 
 class StorageInfo(BaseModel):
+    """Информация о хранилище."""
     id: str = Field(..., description="Идентификатор хранилища", alias="ID")
     name: str = Field(..., description="Название хранилища", alias="NAME")
     code: Optional[str] = Field(None, description="Символьный код", alias="CODE")
@@ -76,6 +80,7 @@ class GetListParams(BaseModel):
 
 
 class GetList(BaseModel):
+    """Ответ метода disk.storage.getlist."""
     result: Optional[List[StorageInfo]] = Field(None, description="Список доступных хранилищ")
 
 
@@ -87,6 +92,7 @@ class GetStorageParams(BaseModel):
 
 
 class GetStorage(BaseModel):
+    """Ответ метода disk.storage.get."""
     result: Optional[StorageInfo] = Field(None, description="Информация о хранилище")
 
 
@@ -98,6 +104,7 @@ class GetFolderParams(BaseModel):
 
 
 class GetFolder(BaseModel):
+    """Ответ метода disk.folder.get."""
     result: Optional[FolderInfo] = Field(None, description="Информация о папке")
 
 
@@ -113,6 +120,7 @@ class AddFolderParams(BaseModel):
 
 
 class AddFolder(BaseModel):
+    """Ответ метода disk.storage.addfolder."""
     result: Optional[FolderInfo] = Field(None, description="Информация о созданной папке")
 
 
@@ -128,6 +136,7 @@ class AddSubfolderParams(BaseModel):
         return params
 
 class AddSubfolder(BaseModel):
+    """Ответ метода disk.folder.addsubfolder."""
     result: Optional[FolderInfo] = Field(None, description="Информация о созданной подпапке")
 
 
@@ -139,6 +148,7 @@ class GetFileParams(BaseModel):
 
 
 class GetFile(BaseModel):
+    """Ответ метода disk.file.get."""
     result: Optional[FileInfo] = Field(None, description="Информация о файле")
 
 
@@ -150,6 +160,7 @@ class DeleteTreeParams(BaseModel):
 
 
 class DeleteTree(BaseModel):
+    """Ответ метода disk.folder.deletetree."""
     result: Optional[bool] = Field(None, description="Результат удаления (true если успешно)")
 
 
@@ -169,19 +180,23 @@ class UploadFileParams(BaseModel):
 
 
 class UploadFile(BaseModel):
+    """Ответ метода disk.folder.uploadfile."""
     result: Optional[FileInfo] = Field(None, description="Информация о загруженном файле")
 
 
 class UploadUrlInfo(BaseModel):
+    """Информация для двухэтапной загрузки файла."""
     field: str = Field(..., description="Имя поля для загрузки файла")
     upload_url: str = Field(..., alias="uploadUrl", description="URL для загрузки файла")
 
 
 class GetUploadUrl(BaseModel):
+    """Ответ метода disk.folder.uploadfile (для получения URL загрузки)."""
     result: Optional[UploadUrlInfo] = Field(None, description="Информация для загрузки файла")
 
 
 class UploadFileComplete(BaseModel):
+    """Ответ метода полной загрузки файла."""
     result: Optional[FileInfo] = Field(None, description="Информация о загруженном файле")
 
 
