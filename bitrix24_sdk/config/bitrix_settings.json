@@ -1,0 +1,4 @@
+{
+  "BASE_URL": "https://poryadok.bitrix24.ru/rest",
+  "TIMEOUT": 60
+}
