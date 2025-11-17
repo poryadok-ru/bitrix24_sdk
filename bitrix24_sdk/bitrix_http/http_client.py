@@ -2,6 +2,7 @@ from ..config.config import BitrixSettings, load_bitrix_settings
 from .client import BitrixHttpClient
 from ..base.service import BaseService
 from ..disk.service import DiskService
+from ..crm.service import CrmService
 
 class BitrixClient:
     """
@@ -12,12 +13,15 @@ class BitrixClient:
     Attributes:
         base: Сервис для работы с базовыми методами API
         disk: Сервис для работы с Disk API
+        crm: Сервис для работы с CRM API
         http: HTTP клиент для выполнения запросов
 
     Example:
         >>> client = BitrixClient(token="your_token", user_id=123)
         >>> storages = client.disk.get_list()
         >>> print(f"Найдено хранилищ: {len(storages.result)}")
+        >>> types = client.crm.type_list()
+        >>> print(f"Найдено смарт-процессов: {types.total}")
     """
 
     def __init__(self, token: str, user_id: int | str, settings: BitrixSettings | None = None,) -> None:
@@ -44,3 +48,4 @@ class BitrixClient:
     
         self.base = BaseService(self.http)
         self.disk = DiskService(self.http)
+        self.crm = CrmService(self.http)

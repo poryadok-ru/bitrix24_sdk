@@ -15,3 +15,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["bitrix24_sdk*"]
+
+[tool.setuptools.package-data]
+bitrix24_sdk = ["config/*.json", "config/*.json.example"]

@@ -3,7 +3,7 @@ from typing import Optional, TYPE_CHECKING
 from .models import Methods, MethodsParams, Scope, ScopeParams
 
 if TYPE_CHECKING:
-    from http_client import BitrixHttpClient
+    from ..bitrix_http import BitrixHttpClient
 
 
 class BaseService:

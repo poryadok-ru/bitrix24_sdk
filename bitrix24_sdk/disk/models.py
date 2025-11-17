@@ -1,6 +1,9 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
+
+from ..utils import BitrixParams
+
 
 class FolderInfo(BaseModel):
     """Информация о папке."""
@@ -35,23 +38,17 @@ class FileInfo(BaseModel):
     download_url: str = Field(..., alias="DOWNLOAD_URL", description="URL для скачивания файла приложением")
     detail_url: str = Field(..., alias="DETAIL_URL", description="Ссылка на страницу детальной информации о файле")
 
-class GetChildrenParams(BaseModel):
+
+class GetChildrenParams(BitrixParams):
+    """Параметры для disk.folder.getchildren."""
     id: int = Field(..., description="Идентификатор папки")
     filter: Optional[Dict[str, Any]] = Field(None, description="Необязательный параметр. Поддерживает фильтрацию по полям, которые указаны в disk.folder.getfields как USE_IN_FILTER: true.")
     start: Optional[int] = Field(None, alias="START", description="Порядковый номер элемента списка, начиная с которого необходимо возвращать следующие элементы при вызове текущего метода")
 
-    def to_bx_params(self) -> dict:
-        params = self.model_dump(exclude_none=True)
-    
-        if 'filter' in params and isinstance(params['filter'], dict):
-            filter_dict = params.pop('filter')
-            for key, value in filter_dict.items():
-                params[f'filter[{key}]'] = value
-        return params
 
 class GetChildren(BaseModel):
     """Ответ метода disk.folder.getchildren."""
-    result: Optional[List[FolderInfo]] = Field(None, description="Список папок и файлов")
+    result: Optional[List[Union[FolderInfo, FileInfo]]] = Field(None, description="Список папок и файлов")
     next: Optional[int] = Field(None, description="Номер следующего элемента для постраничной навигации")
 
 
@@ -66,17 +63,10 @@ class StorageInfo(BaseModel):
     root_object_id: str = Field(..., description="Идентификатор корневой папки", alias="ROOT_OBJECT_ID")
 
 
-class GetListParams(BaseModel):
+class GetListParams(BitrixParams):
+    """Параметры для disk.storage.getlist."""
     filter: Optional[Dict[str, Any]] = Field(None, description="Необязательный параметр. Поддерживает фильтрацию по полям, которые указаны в disk.storage.getfields как USE_IN_FILTER: true.")
     start: Optional[int] = Field(None, alias="START", description="Порядковый номер элемента списка, начиная с которого необходимо возвращать следующие элементы при вызове текущего метода")
-
-    def to_bx_params(self) -> dict:
-        params = self.model_dump(exclude_none=True)
-        if 'filter' in params and isinstance(params['filter'], dict):
-            filter_dict = params.pop('filter')
-            for key, value in filter_dict.items():
-                params[f'filter[{key}]'] = value
-        return params
 
 
 class GetList(BaseModel):
@@ -84,11 +74,9 @@ class GetList(BaseModel):
     result: Optional[List[StorageInfo]] = Field(None, description="Список доступных хранилищ")
 
 
-class GetStorageParams(BaseModel):
+class GetStorageParams(BitrixParams):
+    """Параметры для disk.storage.get."""
     id: str = Field(..., description="Идентификатор хранилища")
-
-    def to_bx_params(self) -> dict:
-        return self.model_dump(exclude_none=True)
 
 
 class GetStorage(BaseModel):
@@ -96,11 +84,9 @@ class GetStorage(BaseModel):
     result: Optional[StorageInfo] = Field(None, description="Информация о хранилище")
 
 
-class GetFolderParams(BaseModel):
+class GetFolderParams(BitrixParams):
+    """Параметры для disk.folder.get."""
     id: int = Field(..., description="Идентификатор папки")
-
-    def to_bx_params(self) -> dict:
-        return self.model_dump(exclude_none=True)
 
 
 class GetFolder(BaseModel):
@@ -108,15 +94,10 @@ class GetFolder(BaseModel):
     result: Optional[FolderInfo] = Field(None, description="Информация о папке")
 
 
-class AddFolderParams(BaseModel):
+class AddFolderParams(BitrixParams):
+    """Параметры для disk.storage.addfolder."""
     id: str = Field(..., description="Идентификатор хранилища")
     data: Dict[str, Any] = Field(..., description="Массив, описывающий папку. Обязательное поле NAME — имя новой папки.")
-
-    def to_bx_params(self) -> dict:
-        params: Dict[str, Any] = {"id": self.id}
-        for key, value in self.data.items():
-            params[f"data[{key}]"] = value
-        return params
 
 
 class AddFolder(BaseModel):
@@ -124,27 +105,20 @@ class AddFolder(BaseModel):
     result: Optional[FolderInfo] = Field(None, description="Информация о созданной папке")
 
 
-class AddSubfolderParams(BaseModel):
+class AddSubfolderParams(BitrixParams):
+    """Параметры для disk.folder.addsubfolder."""
     id: int = Field(..., description="Идентификатор родительской папки")
     data: Dict[str, Any] = Field(..., description="Массив, описывающий папку. Обязательное поле NAME — имя новой папки.")
 
-    def to_bx_params(self) -> dict:
-        params: Dict[str, Any] = {"id": self.id}
-        for key, value in self.data.items():
-            params[f"data[{key}]"] = value
-
-        return params
 
 class AddSubfolder(BaseModel):
     """Ответ метода disk.folder.addsubfolder."""
     result: Optional[FolderInfo] = Field(None, description="Информация о созданной подпапке")
 
 
-class GetFileParams(BaseModel):
+class GetFileParams(BitrixParams):
+    """Параметры для disk.file.get."""
     id: int = Field(..., description="Идентификатор файла")
-
-    def to_bx_params(self) -> dict:
-        return self.model_dump(exclude_none=True)
 
 
 class GetFile(BaseModel):
@@ -152,11 +126,9 @@ class GetFile(BaseModel):
     result: Optional[FileInfo] = Field(None, description="Информация о файле")
 
 
-class DeleteTreeParams(BaseModel):
+class DeleteTreeParams(BitrixParams):
+    """Параметры для disk.folder.deletetree."""
     id: int = Field(..., description="Идентификатор папки")
-
-    def to_bx_params(self) -> dict:
-        return self.model_dump(exclude_none=True)
 
 
 class DeleteTree(BaseModel):
@@ -164,19 +136,13 @@ class DeleteTree(BaseModel):
     result: Optional[bool] = Field(None, description="Результат удаления (true если успешно)")
 
 
-class UploadFileParams(BaseModel):
+class UploadFileParams(BitrixParams):
+    """Параметры для disk.folder.uploadfile."""
     id: int = Field(..., description="Идентификатор папки")
     data: Dict[str, Any] = Field(..., description="Массив, описывающий файл. Обязательное поле NAME — имя файла.")
     file_content: Optional[str] = Field(None, alias="fileContent", description="Файл в формате Base64")
     generate_unique_name: Optional[bool] = Field(None, alias="generateUniqueName", description="Уникализировать имя файла")
     rights: Optional[List[Dict[str, Any]]] = Field(None, description="Массив прав доступа")
-
-    def to_bx_params(self) -> dict:
-        params = self.model_dump(exclude_none=True, by_alias=True)
-        if 'data' in params and isinstance(params['data'], dict):
-            data_dict = params.pop('data')
-            params.update(data_dict)
-        return params
 
 
 class UploadFile(BaseModel):

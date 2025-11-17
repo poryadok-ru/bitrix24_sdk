@@ -2,7 +2,7 @@ import requests
 from typing import Any, Dict, Optional, Type
 from pydantic import BaseModel
 
-from config.config import BitrixSettings, load_bitrix_settings
+from ..config.config import BitrixSettings, load_bitrix_settings
 
 
 class BitrixHttpClient:
@@ -53,7 +53,6 @@ class BitrixHttpClient:
             timeout=self._timeout,
         )
 
-        print(resp.text)
         resp.raise_for_status()
         data = resp.json()
 

@@ -12,7 +12,7 @@ from .models import (
 from typing import Dict, Any
 
 if TYPE_CHECKING:
-    from http_client import BitrixHttpClient
+    from ..bitrix_http import BitrixHttpClient
 
 
 class DiskService:
